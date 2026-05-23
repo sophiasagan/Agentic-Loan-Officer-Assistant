@@ -9,8 +9,8 @@ from pathlib import Path
 
 import aiosqlite
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import Response
 
 from ..agent.graph import loan_agent
 from ..agent.state import AgentState
@@ -69,15 +69,25 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],          # tighten to your Vercel frontend domain in production
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
-    # allow_credentials must NOT be combined with allow_origins=["*"] —
-    # that pairing is invalid per the CORS spec and causes Starlette to
-    # skip OPTIONS preflight handling, resulting in 405 responses.
-)
+_CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+}
+
+
+@app.middleware("http")
+async def cors_middleware(request: Request, call_next):
+    # Short-circuit every OPTIONS preflight before it reaches the router.
+    # Starlette's CORSMiddleware is unreliable in Vercel's Python runtime,
+    # so we handle it explicitly here.
+    if request.method == "OPTIONS":
+        return Response(status_code=200, headers=_CORS_HEADERS)
+    response = await call_next(request)
+    for key, value in _CORS_HEADERS.items():
+        response.headers[key] = value
+    return response
 
 
 # ---------------------------------------------------------------------------
