@@ -6,9 +6,96 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![LangGraph](https://img.shields.io/badge/LangGraph-0.2+-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
 ![Anthropic](https://img.shields.io/badge/Claude_Sonnet_4.6-D97757?style=for-the-badge&logo=anthropic&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
 ![Railway](https://img.shields.io/badge/Deploy_on_Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge)
+
+---
+
+## 🚀 Live Demo
+
+| | URL |
+|--|-----|
+| **Frontend** | [agentic-loan-officer-assistant-sy8m.vercel.app](https://agentic-loan-officer-assistant-sy8m.vercel.app) |
+| **Backend API** | [agentic-loan-officer-assistant-8qft278ak.vercel.app](https://agentic-loan-officer-assistant-8qft278ak.vercel.app) |
+| **API Docs** | [/docs](https://agentic-loan-officer-assistant-8qft278ak.vercel.app/docs) |
+
+---
+
+## UI
+
+### Loan Analysis Dashboard
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 🏦  CU Loan Officer                              Member History ↗        │
+├──────────────────────────┬──────────────────────────────────────────────┤
+│                          │                                              │
+│  New Analysis            │  ✅  APPROVED                                │
+│  ──────────────          │  M001 · Auto Loan · $22,000                  │
+│                          │                                              │
+│  Member ID               │  ┌──────────┐ ┌──────────┐ ┌─────────────┐ │
+│  ┌────────────────────┐  │  │  DTI     │ │  Churn   │ │  Policy     │ │
+│  │ M001               │  │  │  36.1%   │ │  Medium  │ │  ✓ Passed   │ │
+│  └────────────────────┘  │  │  ● green │ │  ● amber │ │  ● green    │ │
+│                          │  └──────────┘ └──────────┘ └─────────────┘ │
+│  Loan Type               │                                              │
+│  ┌────────────────────┐  │  Conditions                                  │
+│  │ Auto  (max $75k)  ▾│  │  • Proof of income required                 │
+│  └────────────────────┘  │  • Gap insurance recommended                 │
+│                          │                                              │
+│  Amount                  │  Assessment                                  │
+│  ┌────────────────────┐  │  ┌──────────────────────────────────────┐   │
+│  │ $ 22,000           │  │  │ Member has 8 years of tenure with    │   │
+│  └────────────────────┘  │  │ 4 products. DTI within policy limits.│   │
+│                          │  │ Medium churn risk — recommend         │   │
+│  Term                    │  │ retention conversation at closing.    │   │
+│  [24] [36] [48] [60] [72]│  └──────────────────────────────────────┘   │
+│                          │                                              │
+│  ┌────────────────────┐  │  Analysis Steps                              │
+│  │  Analyze Loan  →   │  │  ① Get Member Profile      ✓               │
+│  └────────────────────┘  │  ② Get Churn Risk           ✓               │
+│  Analysis takes 20-40s   │  ③ Calculate DTI            ✓               │
+│                          │  ④ Check Lending Policy     ✓               │
+│                          │                                              │
+│                          │  View full history for M001 →               │
+└──────────────────────────┴──────────────────────────────────────────────┘
+```
+
+### Member History
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 🏦  CU Loan Officer                              Member History ↗        │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  Member History                                                         │
+│  Look up past loan analyses for any member.                             │
+│                                                                         │
+│  ┌─────────────────────────────────────────────┐  ┌───────────────┐    │
+│  │ 🔍  M001                                    │  │  Load History │    │
+│  └─────────────────────────────────────────────┘  └───────────────┘    │
+│                                                                         │
+│  🕐 2 analyses for M001                                                 │
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │  May 23, 2026 · 2:02 PM             ┌──────────┐               │   │
+│  │  Auto Loan · $22,000 / 60 mo        │ APPROVED │               │   │
+│  │  DTI 36.1%  ·  Churn: Medium        └──────────┘               │   │
+│  │  ▼  Show details                                                │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │  May 23, 2026 · 1:44 PM             ┌──────────┐               │   │
+│  │  Personal Loan · $8,000 / 36 mo     │  DENIED  │               │   │
+│  │  DTI 41.2%  ·  Churn: High          └──────────┘               │   │
+│  │  ▼  Show details                                                │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -349,23 +436,38 @@ npm create cloudflare@latest cu-loan-ui -- --framework react
 
 ```
 .
-├── requirements.txt
-├── Procfile
-├── railway.toml
-├── README.md
-└── cu_loan_agent/
-    ├── __init__.py
-    ├── loan_history.db          ← created on first run
-    ├── agent/
-    │   ├── __init__.py
-    │   ├── state.py             ← AgentState TypedDict
-    │   ├── tools.py             ← 4 tool functions + Anthropic schemas
-    │   ├── graph.py             ← LangGraph state machine
-    │   └── prompts.py           ← system prompt (future)
-    └── api/
-        ├── __init__.py
-        ├── main.py              ← FastAPI app + SQLite persistence
-        └── schemas.py           ← Pydantic request/response models
+├── requirements.txt             ← Python dependencies
+├── Procfile                     ← Railway / Heroku start command
+├── railway.toml                 ← Railway deployment config
+├── vercel.json                  ← Vercel Python function config
+├── api/
+│   └── index.py                 ← Vercel Python entry point
+├── cu_loan_agent/
+│   ├── __init__.py
+│   ├── agent/
+│   │   ├── state.py             ← AgentState TypedDict
+│   │   ├── tools.py             ← 4 tool functions + Anthropic schemas
+│   │   └── graph.py             ← LangGraph state machine
+│   └── api/
+│       ├── main.py              ← FastAPI app + SQLite + CORS
+│       └── schemas.py           ← Pydantic request/response models
+└── frontend/                    ← Next.js 15 dashboard
+    ├── app/
+    │   ├── layout.tsx           ← Root layout + navy header
+    │   ├── page.tsx             ← Loan analysis dashboard
+    │   ├── history/
+    │   │   └── page.tsx         ← Member history search
+    │   └── api/backend/
+    │       └── [...path]/
+    │           └── route.ts     ← Proxy → backend (eliminates CORS)
+    ├── components/
+    │   ├── LoanForm.tsx         ← Analysis request form
+    │   ├── ResultPanel.tsx      ← Approval banner + metrics
+    │   ├── ProcessingSteps.tsx  ← Agent tool-call timeline
+    │   └── HistoryCard.tsx      ← Expandable history entry
+    └── lib/
+        ├── api.ts               ← Typed fetch client
+        └── types.ts             ← Shared TypeScript types
 ```
 
 ---
