@@ -1,11 +1,12 @@
 import os
-import random
 import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
 
-CHURN_API_URL = os.getenv("CHURN_API_URL", "http://localhost:8000")
+# Empty string or missing var both mean "no churn service available".
+_raw_churn_url = os.getenv("CHURN_API_URL", "").strip()
+CHURN_API_URL: str | None = _raw_churn_url if _raw_churn_url.startswith("http") else None
 
 # ---------------------------------------------------------------------------
 # Synthetic member data store (stand-in for a real DB call)
@@ -64,10 +65,36 @@ def get_member_profile(member_id: str) -> dict:
     }
 
 
+def _synthetic_churn(member_id: str) -> dict:
+    """Deterministic synthetic churn score — used when the churn API is unavailable."""
+    seed = sum(ord(c) for c in member_id)
+    score = round((seed % 100) / 100, 2)
+    if score < 0.35:
+        level = "low"
+        narrative = "Member shows strong engagement with multiple products and consistent activity."
+    elif score < 0.65:
+        level = "medium"
+        narrative = "Member has moderate engagement; some signs of reduced activity in recent months."
+    else:
+        level = "high"
+        narrative = "Member shows limited product usage and decreased login frequency — elevated churn risk."
+    return {
+        "member_id": member_id,
+        "churn_score": score,
+        "risk_level": level,
+        "narrative": narrative,
+        "_source": "synthetic_fallback",
+    }
+
+
 def get_churn_risk(member_id: str) -> dict:
+    # Skip the HTTP call entirely when no churn service is configured.
+    if CHURN_API_URL is None:
+        return _synthetic_churn(member_id)
+
     url = f"{CHURN_API_URL.rstrip('/')}/predict"
     try:
-        response = httpx.post(url, json={"member_id": member_id}, timeout=10.0)
+        response = httpx.post(url, json={"member_id": member_id}, timeout=8.0)
         response.raise_for_status()
         data = response.json()
         return {
@@ -78,23 +105,8 @@ def get_churn_risk(member_id: str) -> dict:
         }
     except httpx.HTTPStatusError as exc:
         return {"error": f"Churn API returned {exc.response.status_code}: {exc.response.text}"}
-    except httpx.RequestError as exc:
-        # Fallback synthetic response so the agent can continue without the churn service
-        seed = sum(ord(c) for c in member_id)
-        score = round((seed % 100) / 100, 2)
-        if score < 0.35:
-            level, narrative = "low", "Member shows strong engagement with multiple products and consistent activity."
-        elif score < 0.65:
-            level, narrative = "medium", "Member has moderate engagement; some signs of reduced activity in recent months."
-        else:
-            level, narrative = "high", "Member shows limited product usage and decreased login frequency—elevated churn risk."
-        return {
-            "member_id": member_id,
-            "churn_score": score,
-            "risk_level": level,
-            "narrative": narrative,
-            "_source": "synthetic_fallback",
-        }
+    except httpx.RequestError:
+        return _synthetic_churn(member_id)
 
 
 _POLICY: dict[str, dict] = {
