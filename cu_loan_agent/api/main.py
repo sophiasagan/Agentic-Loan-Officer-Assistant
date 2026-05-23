@@ -173,6 +173,10 @@ def _row_to_record(row: aiosqlite.Row) -> HistoryRecord:
 # Routes
 # ---------------------------------------------------------------------------
 
+@app.get("/")
+async def health() -> dict:
+    return {"status": "ok", "service": "cu-loan-agent", "docs": "/docs"}
+
 @app.post("/loan/analyze", response_model=LoanAnalysisResponse)
 async def analyze_loan(req: LoanAnalysisRequest) -> LoanAnalysisResponse:
     """Run the LangGraph loan officer agent and return a structured recommendation."""
