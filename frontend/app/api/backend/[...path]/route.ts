@@ -3,29 +3,50 @@
  *
  * The browser calls /api/backend/loan/analyze (same-origin → no CORS).
  * This server-side Next.js function forwards the request to the Python
- * backend and streams the response back.  The backend never needs CORS.
+ * backend. The backend never needs CORS headers.
  */
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND = (process.env.BACKEND_URL ?? 'http://localhost:8000').replace(/\/$/, '');
+const BACKEND = (process.env.BACKEND_URL ?? '').replace(/\/$/, '');
 
 type Ctx = { params: Promise<{ path: string[] }> };
 
+function missingBackendUrl() {
+  return NextResponse.json(
+    {
+      detail:
+        'BACKEND_URL is not set. Add it to your Vercel environment variables ' +
+        '(frontend project → Settings → Environment Variables) and redeploy.',
+    },
+    { status: 502 }
+  );
+}
+
 export async function GET(req: NextRequest, ctx: Ctx) {
+  if (!BACKEND) return missingBackendUrl();
+
   const { path } = await ctx.params;
   const url = `${BACKEND}/${path.join('/')}${req.nextUrl.search}`;
+
   try {
     const res = await fetch(url, { cache: 'no-store' });
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
-  } catch {
-    return NextResponse.json({ detail: 'Backend unreachable' }, { status: 502 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(
+      { detail: `Proxy fetch failed → ${url} : ${msg}` },
+      { status: 502 }
+    );
   }
 }
 
 export async function POST(req: NextRequest, ctx: Ctx) {
+  if (!BACKEND) return missingBackendUrl();
+
   const { path } = await ctx.params;
   const url = `${BACKEND}/${path.join('/')}`;
+
   try {
     const body = await req.text();
     const res = await fetch(url, {
@@ -35,7 +56,11 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     });
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
-  } catch {
-    return NextResponse.json({ detail: 'Backend unreachable' }, { status: 502 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(
+      { detail: `Proxy fetch failed → ${url} : ${msg}` },
+      { status: 502 }
+    );
   }
 }
