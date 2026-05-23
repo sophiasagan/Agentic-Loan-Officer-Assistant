@@ -1,3 +1,8 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "functions": {
+    "app/api/backend/[...path]/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }

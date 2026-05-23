@@ -4,7 +4,9 @@ import type {
   LoanHistoryResponse,
 } from './types';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+// All calls go through the Next.js proxy at /api/backend/*.
+// The proxy forwards server-side to BACKEND_URL — no CORS needed in the browser.
+const BASE = '/api/backend';
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
