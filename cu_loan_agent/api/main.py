@@ -10,6 +10,7 @@ from pathlib import Path
 import aiosqlite
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from ..agent.graph import loan_agent
 from ..agent.state import AgentState
@@ -66,6 +67,14 @@ app = FastAPI(
     description="Agentic loan analysis backed by Claude + LangGraph.",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],          # tighten to your Vercel frontend domain in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
