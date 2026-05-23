@@ -72,9 +72,11 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],          # tighten to your Vercel frontend domain in production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
+    # allow_credentials must NOT be combined with allow_origins=["*"] —
+    # that pairing is invalid per the CORS spec and causes Starlette to
+    # skip OPTIONS preflight handling, resulting in 405 responses.
 )
 
 
