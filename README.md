@@ -235,7 +235,32 @@ Return the last 5 analyses for a member.
 
 ---
 
+## Deploying to Vercel
+
+The repo ships with `vercel.json` and `api/index.py` so Vercel's Python runtime
+can serve the FastAPI app directly — no framework changes required.
+
+```bash
+vercel deploy
+```
+
+**Required env vars in the Vercel dashboard**
+
+| Variable | Value |
+|----------|-------|
+| `ANTHROPIC_API_KEY` | `sk-ant-...` |
+| `CHURN_API_URL` | URL of your churn prediction service |
+| `LOAN_DB_PATH` | `/tmp/loan_history.db` |
+
+> **Limitations on Vercel**
+> - **SQLite is ephemeral** — `/tmp` is wiped on each cold start, so the `/history` endpoint resets between deploys. Use Railway for persistent history.
+> - **Function timeout** — `vercel.json` sets `maxDuration: 60` (Pro plan). The agent makes 4–6 sequential Anthropic calls; upgrade to Pro or Enterprise if you hit timeouts on Hobby.
+
+---
+
 ## Deploying to Railway
+
+Railway is the recommended host for a persistent, long-running backend.
 
 ### One-click deploy
 
